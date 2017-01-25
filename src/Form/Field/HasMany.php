@@ -7,7 +7,6 @@ use Encore\Admin\Form;
 use Encore\Admin\Form\Field;
 use Encore\Admin\Form\NestedForm;
 use Illuminate\Database\Eloquent\Relations\HasMany as Relation;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -271,7 +270,7 @@ class HasMany extends Field
 
         $form->hidden($this->getKeyName());
 
-        $form->hidden(NestedForm::REMOVE_FLAG_NAME)->default(0)->addElementClass(NestedForm::REMOVE_FLAG_CLASS);
+        $form->hidden(NestedForm::REMOVE_FLAG_NAME)->default(0)->attribute(['class' => NestedForm::REMOVE_FLAG_CLASS]);
 
         return $form;
     }
@@ -283,10 +282,6 @@ class HasMany extends Field
      */
     protected function getKeyName()
     {
-        if (is_null($this->form)) {
-            return;
-        }
-
         return $this->form->model()->{$this->relationName}()->getRelated()->getKeyName();
     }
 
@@ -325,16 +320,12 @@ class HasMany extends Field
      */
     protected function buildRelatedForms()
     {
-        if (is_null($this->form)) {
-            return [];
-        }
-
         $model = $this->form->model();
 
         $relation = call_user_func([$model, $this->relationName]);
 
-        if (!$relation instanceof Relation && !$relation instanceof MorphMany) {
-            throw new \Exception('hasMany field must be a HasMany or MorphMany relation.');
+        if (!$relation instanceof Relation) {
+            throw new \Exception('hasMany field must be a HasMany relation.');
         }
 
         $forms = [];
@@ -447,14 +438,14 @@ $('#has-many-{$this->column} > .nav').off('click', 'i.close-tab').on('click', 'i
     }
     if(\$navTab.closest('li').hasClass('active')){
         \$navTab.closest('li').remove();
-        $('#has-many-{$this->column} > .nav > li:nth-child(1) > a').tab('show');
+        $('#has-many-{$this->column} > .nav > li:nth-child(2) > a').tab('show');
     }else{
         \$navTab.closest('li').remove();
     }
 });
 
 var index = 0;
-$('#has-many-{$this->column} > .header').off('click', '.add').on('click', '.add', function(){
+$('#has-many-{$this->column} > .nav > li.nav-tools').off('click', '.add').on('click', '.add', function(){
     index++;
     var navTabHtml = $('#has-many-{$this->column} > template.nav-tab-tpl').html().replace(/{$defaultKey}/g, index);
     var paneHtml = $('#has-many-{$this->column} > template.pane-tpl').html().replace(/{$defaultKey}/g, index);
