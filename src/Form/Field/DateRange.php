@@ -67,4 +67,15 @@ EOT;
 
         return parent::render();
     }
+
+    public function value($value = null)
+    {
+        if (is_null($value)) {
+            return (is_null($this->value['start']) && is_null($this->value['end'])) ? $this->getDefault() : $this->value;
+        }
+
+        $this->value = $value;
+
+        return $this;
+    }
 }
